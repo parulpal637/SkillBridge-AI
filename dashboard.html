@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | SkillBridge AI</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <h2>SkillBridge AI</h2>
+
+        <nav>
+            <a href="#overview">Dashboard</a>
+            <a href="#skills">My Skills</a>
+            <a href="#roadmap">Learning Roadmap</a>
+            <a href="#projects">Projects</a>
+            <a href="#career">Career Preparation</a>
+        </nav>
+
+        <a href="Login.html" class="logout">Logout</a>
+
+    </aside>
+
+    <!-- Main Dashboard -->
+
+    <main class="main-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h1>Student Dashboard</h1>
+                <p>Your personalized career learning journey starts here.</p>
+            </div>
+        </header>
+
+        <!-- Welcome Section -->
+
+        <section class="welcome-card" id="overview">
+
+            <h2>Welcome, <span id="studentName">Student</span>!</h2>
+
+            <p>
+                Let's build your industry-ready skills with SkillBridge AI.
+            </p>
+
+        </section>
+
+        <!-- Career Information -->
+
+        <section class="dashboard-grid">
+
+            <div class="dashboard-card">
+                <h3>Selected Domain</h3>
+                <p id="studentDomain">Not Selected</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>College Category</h3>
+                <p id="collegeType">Not Available</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Learning Status</h3>
+                <p>Getting Started</p>
+            </div>
+
+        </section>
+
+        <!-- Skills -->
+
+        <section class="content-card" id="skills">
+
+            <h2>Industry Required Skills</h2>
+
+            <p>
+                Your selected domain will help us identify the
+                technical skills required by the industry.
+            </p>
+
+            <div id="skillsContent">
+                <p>Loading industry skills...</p>
+            </div>
+
+        </section>
+
+        <!-- Roadmap -->
+
+        <section class="content-card" id="roadmap">
+
+            <h2>Personalized Learning Roadmap</h2>
+
+            <p>
+                Follow your learning journey from beginner
+                to industry-ready level.
+            </p>
+
+            <div class="roadmap-item">
+                <h3>Phase 1: Fundamentals</h3>
+                <p>Build your basic knowledge and programming foundation.</p>
+            </div>
+
+            <div class="roadmap-item">
+                <h3>Phase 2: Core Technical Skills</h3>
+                <p>Learn the essential tools and technologies of your domain.</p>
+            </div>
+
+            <div class="roadmap-item">
+                <h3>Phase 3: Practical Learning</h3>
+                <p>Complete assignments and hands-on exercises.</p>
+            </div>
+
+            <div class="roadmap-item">
+                <h3>Phase 4: Industry Projects</h3>
+                <p>Build real-world projects to demonstrate your skills.</p>
+            </div>
+
+            <div class="roadmap-item">
+                <h3>Phase 5: Career Preparation</h3>
+                <p>Prepare your resume, portfolio and interviews.</p>
+            </div>
+
+        </section>
+
+        <!-- Projects -->
+
+        <section class="content-card" id="projects">
+
+            <h2>Recommended Projects</h2>
+
+            <p>
+                Domain-based practical projects will be recommended here.
+            </p>
+
+        </section>
+
+        <!-- Career Preparation -->
+
+        <section class="content-card" id="career">
+
+            <h2>Career Preparation</h2>
+
+            <p>Resume building</p>
+            <p>Interview preparation</p>
+            <p>Technical assessments</p>
+            <p>Job opportunities</p>
+
+        </section>
+
+        <footer>
+            <p>© 2026 SkillBridge AI | Learn. Practice. Grow.</p>
+        </footer>
+
+    </main>
+
+</div>
+
+<script>
+
+    // Get Student Assessment Data
+
+    const studentData = JSON.parse(
+        sessionStorage.getItem("studentData") || "null"
+    );
+
+    if (studentData) {
+
+        document.getElementById("studentName").textContent =
+            studentData.name || "Student";
+
+        document.getElementById("studentDomain").textContent =
+            studentData.preferredDomain || "Not Selected";
+
+        document.getElementById("collegeType").textContent =
+            studentData.college || "Not Available";
+
+    } else {
+
+        document.getElementById("studentName").textContent =
+            "Student";
+
+    }
+
+</script>
+
+</body>
+</html>
