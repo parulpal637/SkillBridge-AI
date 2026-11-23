@@ -1,17 +1,39 @@
 
+import os
+import json
+
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from database import get_db_connection, create_tables
-import json
 
-import os
 
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "development-key")
+# =====================================
+# 1. FLASK APPLICATION CONFIGURATION
+# =====================================
+
+app = Flask(__name__)
+
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "local-development-secret-key"
+)
+
+# Cookie configuration
+COOKIE_SECURE = os.environ.get(
+    "COOKIE_SECURE", "false"
+).lower() == "true"
 
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = (
+    "None" if COOKIE_SECURE else "Lax"
+)
+app.config["SESSION_COOKIE_SECURE"] = COOKIE_SECURE
+
+
+# =====================================
+# 2. CORS CONFIGURATION
+# =====================================
 
 CORS(
     app,
@@ -22,8 +44,17 @@ CORS(
         "http://localhost:5500"
     ]
 )
+
+
 # =====================================
-# 1. HOME API
+# 3. DATABASE INITIALIZATION
+# =====================================
+
+create_tables()
+
+
+# =====================================
+# 4. HOME API
 # =====================================
 
 @app.route("/", methods=["GET"])
@@ -35,7 +66,7 @@ def home():
 
 
 # =====================================
-# 2. STUDENT REGISTRATION API
+# 5. STUDENT REGISTRATION API
 # =====================================
 
 @app.route("/api/register", methods=["POST"])
@@ -48,10 +79,14 @@ def register():
     password = data.get("password", "")
 
     if not name or not email or not password:
-        return jsonify({"error": "All fields are required"}), 400
+        return jsonify({
+            "error": "All fields are required"
+        }), 400
 
     if len(password) < 8:
-        return jsonify({"error": "Password must contain at least 8 characters"}), 400
+        return jsonify({
+            "error": "Password must contain at least 8 characters"
+        }), 400
 
     conn = get_db_connection()
 
@@ -73,17 +108,24 @@ def register():
         }), 201
 
     except Exception as error:
-        if "UNIQUE constraint failed" in str(error):
-            return jsonify({"error": "Email already registered"}), 409
 
-        return jsonify({"error": "Registration failed"}), 500
+        if "UNIQUE constraint failed" in str(error):
+            return jsonify({
+                "error": "Email already registered"
+            }), 409
+
+        app.logger.exception("Registration error")
+
+        return jsonify({
+            "error": "Registration failed"
+        }), 500
 
     finally:
         conn.close()
 
 
 # =====================================
-# 3. STUDENT LOGIN API
+# 6. STUDENT LOGIN API
 # =====================================
 
 @app.route("/api/login", methods=["POST"])
@@ -95,23 +137,31 @@ def login():
     password = data.get("password", "")
 
     if not email or not password:
-        return jsonify({"error": "Email and password are required"}), 400
+        return jsonify({
+            "error": "Email and password are required"
+        }), 400
 
     conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT * FROM students WHERE email = ?",
-        (email,)
-    )
+    try:
+        cursor = conn.cursor()
 
-    student = cursor.fetchone()
-    conn.close()
+        cursor.execute(
+            "SELECT * FROM students WHERE email = ?",
+            (email,)
+        )
+
+        student = cursor.fetchone()
+
+    finally:
+        conn.close()
 
     if not student or not check_password_hash(
         student["password"], password
     ):
-        return jsonify({"error": "Invalid email or password"}), 401
+        return jsonify({
+            "error": "Invalid email or password"
+        }), 401
 
     session.clear()
     session["student_id"] = student["id"]
@@ -128,7 +178,7 @@ def login():
 
 
 # =====================================
-# 4. STUDENT ASSESSMENT API
+# 7. STUDENT ASSESSMENT API
 # =====================================
 
 @app.route("/api/assessment", methods=["POST"])
@@ -137,52 +187,69 @@ def save_assessment():
     student_id = session.get("student_id")
 
     if not student_id:
-        return jsonify({"error": "Please login first"}), 401
+        return jsonify({
+            "error": "Please login first"
+        }), 401
 
     data = request.get_json(silent=True) or {}
 
-    preferred_domain = data.get("preferredDomain", "").strip()
+    preferred_domain = data.get(
+        "preferredDomain", ""
+    ).strip()
 
     if not preferred_domain:
-        return jsonify({"error": "Please select a domain"}), 400
+        return jsonify({
+            "error": "Please select a domain"
+        }), 400
 
     conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute("""
-        INSERT INTO assessments (
+    try:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO assessments (
+                student_id,
+                college,
+                know_domain,
+                domain_explanation,
+                know_types,
+                known_domains,
+                video_answer,
+                preferred_domain
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
             student_id,
-            college,
-            know_domain,
-            domain_explanation,
-            know_types,
-            known_domains,
-            video_answer,
+            data.get("college", ""),
+            data.get("knowDomain", ""),
+            data.get("domainExplanation", ""),
+            data.get("knowTypes", ""),
+            json.dumps(data.get("knownDomains", [])),
+            data.get("videoAnswer", ""),
             preferred_domain
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        student_id,
-        data.get("college", ""),
-        data.get("knowDomain", ""),
-        data.get("domainExplanation", ""),
-        data.get("knowTypes", ""),
-        json.dumps(data.get("knownDomains", [])),
-        data.get("videoAnswer", ""),
-        preferred_domain
-    ))
+        ))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
 
-    return jsonify({
-        "message": "Assessment saved successfully!",
-        "status": "success"
-    }), 201
+        return jsonify({
+            "message": "Assessment saved successfully!",
+            "status": "success"
+        }), 201
+
+    except Exception:
+        app.logger.exception("Assessment error")
+
+        return jsonify({
+            "error": "Assessment saving failed"
+        }), 500
+
+    finally:
+        conn.close()
 
 
 # =====================================
-# 5. STUDENT PROFILE API
+# 8. STUDENT PROFILE API
 # =====================================
 
 @app.route("/api/profile", methods=["GET"])
@@ -191,41 +258,49 @@ def profile():
     student_id = session.get("student_id")
 
     if not student_id:
-        return jsonify({"error": "Please login first"}), 401
+        return jsonify({
+            "error": "Please login first"
+        }), 401
 
     conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT id, name, email, created_at
-        FROM students
-        WHERE id = ?
-    """, (student_id,))
+    try:
+        cursor = conn.cursor()
 
-    student = cursor.fetchone()
+        cursor.execute("""
+            SELECT id, name, email, created_at
+            FROM students
+            WHERE id = ?
+        """, (student_id,))
 
-    cursor.execute("""
-        SELECT *
-        FROM assessments
-        WHERE student_id = ?
-        ORDER BY id DESC
-        LIMIT 1
-    """, (student_id,))
+        student = cursor.fetchone()
 
-    assessment = cursor.fetchone()
-    conn.close()
+        cursor.execute("""
+            SELECT *
+            FROM assessments
+            WHERE student_id = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (student_id,))
 
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
+        assessment = cursor.fetchone()
 
-    return jsonify({
-        "student": dict(student),
-        "assessment": dict(assessment) if assessment else None
-    })
+        if not student:
+            return jsonify({
+                "error": "Student not found"
+            }), 404
+
+        return jsonify({
+            "student": dict(student),
+            "assessment": dict(assessment) if assessment else None
+        })
+
+    finally:
+        conn.close()
 
 
 # =====================================
-# 6. SAVE SKILL ASSESSMENT API
+# 9. SAVE SKILL ASSESSMENT API
 # =====================================
 
 @app.route("/api/skills", methods=["POST"])
@@ -234,55 +309,80 @@ def save_skills():
     student_id = session.get("student_id")
 
     if not student_id:
-        return jsonify({"error": "Please login first"}), 401
+        return jsonify({
+            "error": "Please login first"
+        }), 401
 
     data = request.get_json(silent=True) or {}
     results = data.get("results", [])
 
     if not isinstance(results, list) or not results:
-        return jsonify({"error": "Skill results are required"}), 400
+        return jsonify({
+            "error": "Skill results are required"
+        }), 400
 
-    allowed_levels = ["Beginner", "Intermediate", "Advanced"]
+    allowed_levels = [
+        "Beginner",
+        "Intermediate",
+        "Advanced"
+    ]
 
     for item in results:
+
         if (
             not isinstance(item, dict)
             or not item.get("skill")
             or item.get("level") not in allowed_levels
         ):
-            return jsonify({"error": "Invalid skill data"}), 400
+            return jsonify({
+                "error": "Invalid skill data"
+            }), 400
 
     conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute(
-        "DELETE FROM skill_results WHERE student_id = ?",
-        (student_id,)
-    )
+    try:
+        cursor = conn.cursor()
 
-    for item in results:
-        cursor.execute("""
-            INSERT INTO skill_results (
-                student_id, skill_name, skill_level
-            )
-            VALUES (?, ?, ?)
-        """, (
-            student_id,
-            item["skill"],
-            item["level"]
-        ))
+        cursor.execute(
+            "DELETE FROM skill_results WHERE student_id = ?",
+            (student_id,)
+        )
 
-    conn.commit()
-    conn.close()
+        for item in results:
 
-    return jsonify({
-        "message": "Skills saved successfully!",
-        "status": "success"
-    })
+            cursor.execute("""
+                INSERT INTO skill_results (
+                    student_id,
+                    skill_name,
+                    skill_level
+                )
+                VALUES (?, ?, ?)
+            """, (
+                student_id,
+                item["skill"],
+                item["level"]
+            ))
+
+        conn.commit()
+
+        return jsonify({
+            "message": "Skills saved successfully!",
+            "status": "success"
+        })
+
+    except Exception:
+        app.logger.exception("Skills saving error")
+
+        return jsonify({
+            "error": "Skills saving failed"
+        }), 500
+
+    finally:
+        conn.close()
 
 
 # =====================================
-# 7. GET SAVED SKILLS API
+# 10. GET SAVED SKILLS API
 # =====================================
 
 @app.route("/api/skills", methods=["GET"])
@@ -291,33 +391,39 @@ def get_skills():
     student_id = session.get("student_id")
 
     if not student_id:
-        return jsonify({"error": "Please login first"}), 401
+        return jsonify({
+            "error": "Please login first"
+        }), 401
 
     conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT skill_name, skill_level
-        FROM skill_results
-        WHERE student_id = ?
-    """, (student_id,))
+    try:
+        cursor = conn.cursor()
 
-    rows = cursor.fetchall()
-    conn.close()
+        cursor.execute("""
+            SELECT skill_name, skill_level
+            FROM skill_results
+            WHERE student_id = ?
+        """, (student_id,))
 
-    return jsonify({
-        "skills": [
-            {
-                "skill": row["skill_name"],
-                "level": row["skill_level"]
-            }
-            for row in rows
-        ]
-    })
+        rows = cursor.fetchall()
+
+        return jsonify({
+            "skills": [
+                {
+                    "skill": row["skill_name"],
+                    "level": row["skill_level"]
+                }
+                for row in rows
+            ]
+        })
+
+    finally:
+        conn.close()
 
 
 # =====================================
-# 8. LOGOUT API
+# 11. LOGOUT API
 # =====================================
 
 @app.route("/api/logout", methods=["POST"])
@@ -326,14 +432,19 @@ def logout():
     session.clear()
 
     return jsonify({
-        "message": "Logged out successfully!"
+        "message": "Logged out successfully!",
+        "status": "success"
     })
 
 
 # =====================================
-# START SERVER
+# 12. RUN LOCAL SERVER
 # =====================================
 
 if __name__ == "__main__":
-    create_tables()
-    app.run(debug=True, port=5000)
+
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=True
+    )
