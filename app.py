@@ -5,18 +5,23 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db_connection, create_tables
 import json
 
-app = Flask(__name__)
+import os
 
-app.config["SECRET_KEY"] = "skillbridge-ai-local-development-key"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "development-key")
+
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True
 
-CORS(app, supports_credentials=True, origins=[
-    "http://127.0.0.1:5500",
-    "http://localhost:5500"
-])
-
-
+CORS(
+    app,
+    supports_credentials=True,
+    origins=[
+        "https://skillbridge-ai-oofk.netlify.app",
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"
+    ]
+)
 # =====================================
 # 1. HOME API
 # =====================================
