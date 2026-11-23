@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Assessment | SkillBridge AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="form-wrapper">
+<div class="form-box">
+
+    <h1>SkillBridge AI</h1>
+    <p class="subtitle">Bridge the Gap Between Learning and Industry</p>
+
+    <h2>Student Assessment Form</h2>
+    <p class="description">
+        Please fill out this form so that we can understand your knowledge,
+        interests and career goals.
+    </p>
+
+    <form id="studentForm">
+
+        <!-- Q1 -->
+        <label for="Q1">1. What is your name?</label>
+        <input type="text" name="name" id="Q1"
+        placeholder="Enter your full name" required>
+
+        <!-- Q2 -->
+        <label>2. What type of college are you studying in?</label>
+
+        <div class="radio-group">
+            <label><input type="radio" name="college" value="Tier 1" required> Tier 1</label>
+            <label><input type="radio" name="college" value="Tier 2"> Tier 2</label>
+            <label><input type="radio" name="college" value="Tier 3"> Tier 3</label>
+        </div>
+
+        <!-- Q3 -->
+        <label>3. Do you know what a Domain is in the IT industry?</label>
+
+        <div class="radio-group">
+            <label><input type="radio" name="knowDomain" value="Yes" required> Yes</label>
+            <label><input type="radio" name="knowDomain" value="No"> No</label>
+        </div>
+
+        <div id="explanationBox" class="hidden">
+            <label>Explain what a Domain is in your own words.</label>
+            <textarea id="domainExplanation"
+            placeholder="Write your answer here..."></textarea>
+        </div>
+
+        <!-- Q4 -->
+        <label>4. Do you know about different types of domains?</label>
+
+        <div class="radio-group">
+            <label><input type="radio" name="knowTypes" value="Yes" required> Yes</label>
+            <label><input type="radio" name="knowTypes" value="No"> No</label>
+        </div>
+
+        <div id="knownDomains" class="hidden">
+            <label>Select the domains you know about:</label>
+
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="domains" value="AI/ML"> AI / ML</label>
+                <label><input type="checkbox" name="domains" value="Data Science"> Data Science</label>
+                <label><input type="checkbox" name="domains" value="Web Development"> Web Development</label>
+                <label><input type="checkbox" name="domains" value="App Development"> App Development</label>
+                <label><input type="checkbox" name="domains" value="Cybersecurity"> Cybersecurity</label>
+                <label><input type="checkbox" name="domains" value="Cloud Computing"> Cloud Computing</label>
+                <label><input type="checkbox" name="domains" value="DevOps"> DevOps</label>
+                <label><input type="checkbox" name="domains" value="UI/UX"> UI/UX Design</label>
+                <label><input type="checkbox" name="domains" value="Blockchain"> Blockchain</label>
+                <label><input type="checkbox" name="domains" value="Other"> Other</label>
+            </div>
+        </div>
+
+        <div id="unknownDomains" class="hidden">
+            <p>
+                Don't worry! First, let's understand different
+                technology domains through a short video.
+            </p>
+
+            <button type="button" id="watchVideo">
+                Watch Introduction Video
+            </button>
+        </div>
+
+        <!-- Q5 -->
+        <div id="videoAnswerBox" class="hidden">
+            <label>
+                5. After watching the video, explain:
+                What is a Domain?
+            </label>
+            <textarea id="videoAnswer"
+            placeholder="Explain in your own words..."></textarea>
+        </div>
+
+        <!-- Q6 -->
+        <label>6. Which domain are you interested in?</label>
+
+        <select id="preferredDomain" name="preferredDomain" required>
+            <option value="">Select your preferred domain</option>
+            <option>AI / Machine Learning</option>
+            <option>Data Science</option>
+            <option>Web Development</option>
+            <option>App Development</option>
+            <option>Cybersecurity</option>
+            <option>Cloud Computing</option>
+            <option>DevOps</option>
+            <option>UI/UX Design</option>
+            <option>Blockchain</option>
+            <option>Software Testing</option>
+            <option>Not Sure Yet</option>
+        </select>
+
+        <button type="submit" class="login-btn">
+            Submit Assessment
+        </button>
+
+        <button type="reset" class="cancel-btn">
+            Reset Form
+        </button>
+
+    </form>
+
+</div>
+</div>
+
+<!-- VIDEO POPUP -->
+
+<div id="videoModal" class="modal">
+    <div class="modal-content">
+
+        <h2>What is a Domain?</h2>
+
+        <iframe
+            id="domainVideo"
+            src=""
+            title="Introduction to Technology Domains"
+            allowfullscreen>
+        </iframe>
+
+        <p>Watch the video and understand different technology domains.</p>
+
+        <button type="button" id="closeVideo">
+            Done Watching
+        </button>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

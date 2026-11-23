@@ -1,0 +1,1101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard | SkillBridge AI</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f6fc;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 245px;
+    background: #172b50;
+    color: white;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.sidebar h2 { margin-bottom: 25px; }
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 7px;
+}
+
+.sidebar a:hover { background: #315da8; }
+
+.logout {
+    margin-top: auto;
+    background: #a83b45;
+    text-align: center;
+    padding: 12px;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
+}
+
+.dashboard-header h1 { color: #172b50; }
+
+.welcome-card {
+    background: linear-gradient(120deg,#244b91,#557fd0);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin: 25px 0;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+}
+
+.dashboard-card,
+.content-card {
+    background: white;
+    padding: 22px;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+
+.dashboard-card p {
+    color: #244b91;
+    font-weight: bold;
+}
+
+.content-card h2 { color: #244b91; }
+
+button {
+    background: #315da8;
+    color: white;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    margin: 8px 5px 8px 0;
+}
+
+button:hover { background: #1e3f7c; }
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.skill-level-item {
+    margin: 15px 0;
+}
+
+.skill-level-item label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.skill-level-item select,
+.resume-form input,
+.resume-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    margin-bottom: 12px;
+}
+
+.roadmap-item {
+    padding: 17px;
+    background: #f5f7fc;
+    border-left: 4px solid #315da8;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+.roadmap-item h3 { color: #244b91; }
+
+.resume-document {
+    background: white;
+    color: #222;
+    max-width: 750px;
+    margin: 25px auto;
+    padding: 35px;
+    border: 1px solid #ddd;
+    font-family: Arial,sans-serif;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.resume-document h1 {
+    color: #244b91;
+    text-align: center;
+}
+
+.resume-document h2 {
+    color: #244b91;
+    font-size: 17px;
+    border-bottom: 1px solid #244b91;
+    margin-top: 20px;
+}
+
+.resume-contact { text-align: center; }
+
+.progress {
+    height: 12px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #315da8;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+}
+
+@media(max-width:800px) {
+    .dashboard-container { flex-direction: column; }
+    .sidebar { width: 100%; }
+    .sidebar nav { flex-direction: row; flex-wrap: wrap; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .main-content { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+<aside class="sidebar">
+
+<h2>SkillBridge AI</h2>
+
+<nav>
+<a href="#overview">🏠 Dashboard</a>
+<a href="#skills">📚 My Skills</a>
+<a href="#skill-assessment">📊 Skill Assessment</a>
+<a href="#roadmap">🗺️ Learning Roadmap</a>
+<a href="#projects">💻 Projects</a>
+<a href="#career">🎯 Career Preparation</a>
+<a href="#resume-builder">📄 Resume Builder</a>
+</nav>
+
+<button class="logout" id="logoutBtn">Logout</button>
+
+</aside>
+
+<main class="main-content">
+
+<header class="dashboard-header">
+<h1>Student Dashboard</h1>
+<p>Your personalized career learning journey starts here.</p>
+</header>
+
+<section class="welcome-card" id="overview">
+<h2>Welcome, <span id="studentName">Student</span>!</h2>
+<p>Let's build your industry-ready skills with SkillBridge AI.</p>
+</section>
+
+<section class="dashboard-grid">
+
+<div class="dashboard-card">
+<h3>Selected Domain</h3>
+<p id="studentDomain">Loading...</p>
+</div>
+
+<div class="dashboard-card">
+<h3>College Category</h3>
+<p id="collegeType">Loading...</p>
+</div>
+
+<div class="dashboard-card">
+<h3>Learning Status</h3>
+<p id="learningStatus">Getting Started</p>
+</div>
+
+</section>
+
+<section class="content-card" id="skills">
+<h2>Industry Required Skills</h2>
+<div id="skillsContent">Loading skills...</div>
+</section>
+
+<section class="content-card" id="skill-assessment">
+
+<h2>My Current Skill Level</h2>
+<p>Select your current proficiency level for each skill.</p>
+
+<div id="skillAssessmentContent"></div>
+
+<button id="analyzeSkills" type="button">
+Analyze My Skills
+</button>
+
+<div id="skillGapResult"></div>
+
+</section>
+
+<section class="content-card" id="roadmap">
+<h2>My Personalized Learning Roadmap</h2>
+<div id="roadmapContent">
+Complete your skill assessment first.
+</div>
+</section>
+
+<section class="content-card" id="projects">
+<h2>Recommended Projects</h2>
+<div id="projectsContent">
+Complete your skill assessment first.
+</div>
+</section>
+
+<section class="content-card" id="career">
+
+<h2>Career Preparation</h2>
+
+<div class="roadmap-item">
+<h3>Interview Preparation</h3>
+<p>Practice technical interview questions.</p>
+<button type="button" id="interviewBtn">Start Interview Practice</button>
+<div id="interviewQuestions"></div>
+</div>
+
+<div class="roadmap-item">
+<h3>Technical Quiz</h3>
+<p>Test your technical knowledge.</p>
+<button type="button" id="quizBtn">Start Technical Quiz</button>
+<div id="quizContent"></div>
+</div>
+
+<div class="roadmap-item">
+<h3>Job Preparation Tracker</h3>
+
+<label><input type="checkbox"> Resume Completed</label><br>
+<label><input type="checkbox"> Projects Completed</label><br>
+<label><input type="checkbox"> Interview Practice Completed</label>
+
+</div>
+
+</section>
+
+<section class="content-card" id="resume-builder">
+
+<h2>Resume Builder</h2>
+<p>Create and download your professional resume.</p>
+
+<div class="resume-form">
+
+<label>Full Name</label>
+<input type="text" id="resumeName" placeholder="Enter full name">
+
+<label>Email Address</label>
+<input type="email" id="resumeEmail" placeholder="Enter email">
+
+<label>Phone Number</label>
+<input type="tel" id="resumePhone" placeholder="Enter phone number">
+
+<label>Education</label>
+<textarea id="resumeEducation" placeholder="Degree, college, year"></textarea>
+
+<label>Technical Skills</label>
+<textarea id="resumeSkills" placeholder="Python, Machine Learning, SQL"></textarea>
+
+<label>Projects</label>
+<textarea id="resumeProjects" placeholder="Enter your projects"></textarea>
+
+<label>Certifications</label>
+<textarea id="resumeCertifications" placeholder="Enter certifications"></textarea>
+
+<label>Career Objective</label>
+<textarea id="resumeObjective" placeholder="Write your career objective"></textarea>
+
+<button type="button" id="generateResume">Generate Resume</button>
+
+<button type="button" id="downloadResume">Download Resume PDF</button>
+
+</div>
+
+<div id="resumePreview"></div>
+
+</section>
+
+<footer>
+© 2026 SkillBridge AI | Learn. Practice. Grow.
+</footer>
+
+</main>
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:5000";
+
+let studentData = null;
+let requiredSkills = [];
+let savedResults = [];
+
+const skillsData = {
+
+"AI / Machine Learning": [
+"Python","NumPy","Pandas","Statistics",
+"Machine Learning","Scikit-learn",
+"Deep Learning","Natural Language Processing",
+"Model Deployment"
+],
+
+"Data Science": [
+"Python","Statistics","SQL","Pandas",
+"Data Visualization","Machine Learning"
+],
+
+"Web Development": [
+"HTML","CSS","JavaScript","Python",
+"Flask","SQL","API Development"
+],
+
+"Cybersecurity": [
+"Networking","Linux","Python",
+"Web Security","Cryptography","Ethical Hacking"
+],
+
+"Cloud Computing": [
+"Linux","Networking","AWS",
+"Cloud Architecture","Docker","Security"
+]
+
+};
+
+const learningTopics = {
+
+"Python":["Variables","Loops","Functions","OOP","Mini Project"],
+"NumPy":["Arrays","Array Operations","Indexing"],
+"Pandas":["DataFrames","Data Cleaning","Data Analysis"],
+"Statistics":["Mean Median Mode","Probability","Hypothesis Testing"],
+"Machine Learning":["Supervised Learning","Regression","Classification","Model Evaluation"],
+"Scikit-learn":["Preprocessing","Model Training","Model Evaluation"],
+"Deep Learning":["Neural Networks","Activation Functions","TensorFlow"],
+"Natural Language Processing":["Text Processing","Tokenization","TF-IDF","Text Classification"],
+"Model Deployment":["Flask API","Model Serialization","Deployment"],
+"SQL":["Queries","Joins","Database Design"],
+"HTML":["HTML Structure","Forms","Semantic HTML"],
+"CSS":["Selectors","Flexbox","Responsive Design"],
+"JavaScript":["Variables","Functions","DOM Manipulation"],
+"Flask":["Routes","Templates","REST APIs"],
+"Networking":["TCP/IP","DNS","Network Protocols"],
+"Linux":["Commands","File Permissions","Shell"],
+"AWS":["EC2","S3","IAM"],
+"Docker":["Images","Containers","Docker Compose"]
+
+};
+
+const projectsData = {
+
+"AI / Machine Learning":[
+{name:"Python Calculator",level:"Beginner",description:"Build a calculator using Python."},
+{name:"Spam Email Detection",level:"Intermediate",description:"Build an ML spam classifier."},
+{name:"AI Resume Analyzer",level:"Advanced",description:"Build an intelligent resume analysis system."},
+{name:"Customer Churn Prediction",level:"Advanced",description:"Predict customer churn using ML."}
+],
+
+"Data Science":[
+{name:"Student Marks Analysis",level:"Beginner",description:"Analyze student performance."},
+{name:"Sales Visualization",level:"Intermediate",description:"Create sales reports."},
+{name:"Customer Churn Prediction",level:"Advanced",description:"Predict customer churn."}
+],
+
+"Web Development":[
+{name:"Personal Portfolio",level:"Beginner",description:"Create a responsive portfolio."},
+{name:"Student Management System",level:"Intermediate",description:"Build a management application."},
+{name:"E-commerce Website",level:"Advanced",description:"Develop an online shopping website."}
+],
+
+"Cybersecurity":[
+{name:"Password Strength Checker",level:"Beginner",description:"Check password strength locally."},
+{name:"Phishing URL Detector",level:"Intermediate",description:"Identify suspicious URLs."},
+{name:"Network Traffic Analyzer",level:"Advanced",description:"Analyze network traffic."}
+],
+
+"Cloud Computing":[
+{name:"Cloud File Storage",level:"Beginner",description:"Create basic cloud storage."},
+{name:"Server Monitoring",level:"Intermediate",description:"Monitor server performance."},
+{name:"Cloud Deployment",level:"Advanced",description:"Deploy an application to cloud."}
+]
+
+};
+
+
+// =====================================
+// 1. LOAD STUDENT PROFILE
+// =====================================
+
+async function loadDashboard() {
+
+    try {
+
+        const response = await fetch(API + "/api/profile", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert("Please login first.");
+            window.location.href = "Login.html";
+            return;
+        }
+
+        studentData = data.student;
+        const assessment = data.assessment;
+
+        document.getElementById("studentName").textContent =
+            studentData.name;
+
+        document.getElementById("resumeName").value =
+            studentData.name || "";
+
+        document.getElementById("resumeEmail").value =
+            studentData.email || "";
+
+        if (!assessment) {
+            alert("Please complete your assessment first.");
+            window.location.href = "form.html";
+            return;
+        }
+
+        studentData.preferredDomain = assessment.preferred_domain;
+        studentData.college = assessment.college;
+
+        sessionStorage.setItem("studentData", JSON.stringify(studentData));
+
+        document.getElementById("studentDomain").textContent =
+            assessment.preferred_domain;
+
+        document.getElementById("collegeType").textContent =
+            assessment.college || "Not Available";
+
+        requiredSkills = skillsData[assessment.preferred_domain] || [];
+
+        renderSkills();
+        await loadSavedSkills();
+
+    } catch(error) {
+
+        console.error(error);
+        alert("Cannot connect to backend. Please start Flask server.");
+
+    }
+
+}
+
+
+// =====================================
+// 2. DISPLAY INDUSTRY SKILLS
+// =====================================
+
+function renderSkills() {
+
+    const skillsContent = document.getElementById("skillsContent");
+    const assessmentContent = document.getElementById("skillAssessmentContent");
+
+    skillsContent.innerHTML = "";
+    assessmentContent.innerHTML = "";
+
+    requiredSkills.forEach((skill,index) => {
+
+        const p = document.createElement("p");
+        p.textContent = "✓ " + skill;
+        skillsContent.appendChild(p);
+
+        const box = document.createElement("div");
+        box.className = "skill-level-item";
+
+        const label = document.createElement("label");
+        label.textContent = skill;
+        label.htmlFor = "skillLevel" + index;
+
+        const select = document.createElement("select");
+        select.id = "skillLevel" + index;
+
+        [
+            ["","Select your level"],
+            ["Beginner","Beginner"],
+            ["Intermediate","Intermediate"],
+            ["Advanced","Advanced"]
+        ].forEach(([value,text]) => {
+
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = text;
+            select.appendChild(option);
+
+        });
+
+        box.append(label,select);
+        assessmentContent.appendChild(box);
+
+    });
+
+}
+
+
+// =====================================
+// 3. LOAD SAVED SKILLS FROM DATABASE
+// =====================================
+
+async function loadSavedSkills() {
+
+    try {
+
+        const response = await fetch(API + "/api/skills", {
+            credentials: "include"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) return;
+
+        savedResults = data.skills.map(item => ({
+            skill: item.skill,
+            level: item.level
+        }));
+
+        savedResults.forEach(item => {
+
+            const index = requiredSkills.indexOf(item.skill);
+
+            if (index !== -1) {
+                document.getElementById("skillLevel" + index).value =
+                    item.level;
+            }
+
+        });
+
+        if (savedResults.length === requiredSkills.length) {
+            displayResults(savedResults, calculateScore(savedResults));
+        }
+
+    } catch(error) {
+        console.error("Skill loading error:",error);
+    }
+
+}
+
+
+// =====================================
+// 4. SAVE SKILLS TO DATABASE
+// =====================================
+
+document.getElementById("analyzeSkills").addEventListener("click", async function() {
+
+    const results = [];
+
+    for (let i = 0; i < requiredSkills.length; i++) {
+
+        const select = document.getElementById("skillLevel" + i);
+
+        if (!select.value) {
+            alert("Please select your level for " + requiredSkills[i]);
+            return;
+        }
+
+        results.push({
+            skill: requiredSkills[i],
+            level: select.value
+        });
+
+    }
+
+    const button = this;
+    button.disabled = true;
+
+    try {
+
+        const response = await fetch(API + "/api/skills", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({results})
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.error || "Could not save skills.");
+            return;
+        }
+
+        savedResults = results;
+
+        const score = calculateScore(results);
+
+        displayResults(results,score);
+
+        alert("Skill assessment saved successfully!");
+
+    } catch(error) {
+
+        console.error(error);
+        alert("Backend connection failed.");
+
+    } finally {
+        button.disabled = false;
+    }
+
+});
+
+
+// =====================================
+// 5. SKILL GAP ANALYSIS
+// =====================================
+
+function calculateScore(results) {
+
+    const total = results.reduce((sum,item) => {
+
+        return sum + (
+            item.level === "Advanced" ? 100 :
+            item.level === "Intermediate" ? 60 : 25
+        );
+
+    },0);
+
+    return Math.round(total / results.length);
+
+}
+
+function displayResults(results,score) {
+
+    const result = document.getElementById("skillGapResult");
+
+    result.innerHTML = `
+        <h2>Your Skill Gap Report</h2>
+        <h3>Industry Readiness Score: ${score}%</h3>
+        <div class="progress">
+            <div class="progress-bar" style="width:${score}%"></div>
+        </div>
+    `;
+
+    ["Beginner","Intermediate","Advanced"].forEach(level => {
+
+        const group = results.filter(item => item.level === level);
+
+        const heading = document.createElement("h3");
+        heading.textContent = level + " Skills: " + group.length;
+        result.appendChild(heading);
+
+        group.forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = "✓ " + item.skill;
+            result.appendChild(p);
+        });
+
+    });
+
+    document.getElementById("learningStatus").textContent =
+        "Skill Assessment Completed";
+
+    generateRoadmap(results);
+    generateProjects(results);
+
+}
+
+
+// =====================================
+// 6. PERSONALIZED ROADMAP
+// =====================================
+
+function generateRoadmap(results) {
+
+    const container = document.getElementById("roadmapContent");
+    container.innerHTML = "";
+
+    ["Beginner","Intermediate","Advanced"].forEach(level => {
+
+        const matched = results.filter(item => item.level === level);
+
+        const card = document.createElement("div");
+        card.className = "roadmap-item";
+
+        const heading = document.createElement("h3");
+        heading.textContent = level + " Learning Phase";
+
+        card.appendChild(heading);
+
+        if (!matched.length) {
+            card.appendChild(document.createTextNode("No skills in this phase."));
+        }
+
+        matched.forEach(item => {
+
+            const h4 = document.createElement("h4");
+            h4.textContent = item.skill;
+
+            const ul = document.createElement("ul");
+
+            (learningTopics[item.skill] || [
+                "Learn Fundamentals",
+                "Practice Concepts",
+                "Build a Mini Project"
+            ]).forEach(topic => {
+
+                const li = document.createElement("li");
+                li.textContent = topic;
+                ul.appendChild(li);
+
+            });
+
+            card.append(h4,ul);
+
+        });
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+// =====================================
+// 7. PROJECT RECOMMENDATIONS
+// =====================================
+
+function generateProjects(results) {
+
+    const container = document.getElementById("projectsContent");
+    container.innerHTML = "";
+
+    const projects = projectsData[studentData.preferredDomain] || [];
+
+    const beginner = results.some(item => item.level === "Beginner");
+    const intermediate = results.some(item => item.level === "Intermediate");
+
+    const level = beginner ? "Beginner" :
+                  intermediate ? "Intermediate" : "Advanced";
+
+    const recommended = projects.filter(project => project.level === level);
+
+    (recommended.length ? recommended : projects).forEach(project => {
+
+        const card = document.createElement("div");
+        card.className = "roadmap-item";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = project.name;
+
+        const p1 = document.createElement("p");
+        p1.textContent = "Difficulty: " + project.level;
+
+        const p2 = document.createElement("p");
+        p2.textContent = project.description;
+
+        card.append(h3,p1,p2);
+        container.appendChild(card);
+
+    });
+
+}
+
+
+// =====================================
+// 8. INTERVIEW PRACTICE
+// =====================================
+
+document.getElementById("interviewBtn").addEventListener("click",function() {
+
+    const questions = [
+        "What is Python?",
+        "What is Machine Learning?",
+        "Difference between supervised and unsupervised learning?",
+        "What is Pandas?",
+        "What is overfitting?",
+        "What is model evaluation?"
+    ];
+
+    const container = document.getElementById("interviewQuestions");
+    container.innerHTML = "<h3>Practice Questions</h3>";
+
+    questions.forEach((question,index) => {
+
+        const p = document.createElement("p");
+        p.textContent = (index + 1) + ". " + question;
+        container.appendChild(p);
+
+    });
+
+});
+
+
+// =====================================
+// 9. TECHNICAL QUIZ
+// =====================================
+
+document.getElementById("quizBtn").addEventListener("click",function() {
+
+    const questions = [
+        {
+            q:"Which language is widely used in AI?",
+            options:["Python","HTML","CSS"],
+            answer:"Python"
+        },
+        {
+            q:"Which library is used for data analysis?",
+            options:["Pandas","Bootstrap","React"],
+            answer:"Pandas"
+        },
+        {
+            q:"What does ML stand for?",
+            options:["Machine Learning","Modern Language","Main Logic"],
+            answer:"Machine Learning"
+        }
+    ];
+
+    const container = document.getElementById("quizContent");
+    container.innerHTML = "<h3>Technical Quiz</h3>";
+
+    questions.forEach((question,index) => {
+
+        const div = document.createElement("div");
+
+        const heading = document.createElement("p");
+        heading.textContent = (index+1) + ". " + question.q;
+        div.appendChild(heading);
+
+        question.options.forEach(option => {
+
+            const label = document.createElement("label");
+            const radio = document.createElement("input");
+
+            radio.type = "radio";
+            radio.name = "quiz" + index;
+            radio.value = option;
+
+            label.append(radio,document.createTextNode(" " + option));
+            div.appendChild(label);
+            div.appendChild(document.createElement("br"));
+
+        });
+
+        container.appendChild(div);
+
+    });
+
+    const submit = document.createElement("button");
+    submit.textContent = "Submit Quiz";
+
+    submit.addEventListener("click",() => {
+
+        let score = 0;
+
+        questions.forEach((question,index) => {
+
+            const selected = document.querySelector(
+                'input[name="quiz' + index + '"]:checked'
+            );
+
+            if(selected && selected.value === question.answer) score++;
+
+        });
+
+        container.querySelector("#quizScore")?.remove();
+
+        const result = document.createElement("h3");
+        result.id = "quizScore";
+        result.textContent = "Your Score: " + score + "/" + questions.length;
+
+        container.appendChild(result);
+
+    });
+
+    container.appendChild(submit);
+
+});
+
+
+// =====================================
+// 10. RESUME BUILDER
+// =====================================
+
+function escapeHTML(value) {
+
+    return String(value).replace(/[&<>"']/g,char => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+    })[char]);
+
+}
+
+document.getElementById("generateResume").addEventListener("click",function() {
+
+    const fields = {
+        name: document.getElementById("resumeName").value.trim(),
+        email: document.getElementById("resumeEmail").value.trim(),
+        phone: document.getElementById("resumePhone").value.trim(),
+        education: document.getElementById("resumeEducation").value.trim(),
+        skills: document.getElementById("resumeSkills").value.trim(),
+        projects: document.getElementById("resumeProjects").value.trim(),
+        certifications: document.getElementById("resumeCertifications").value.trim(),
+        objective: document.getElementById("resumeObjective").value.trim()
+    };
+
+    if (!fields.name || !fields.email || !fields.education || !fields.skills) {
+        alert("Please fill Name, Email, Education and Skills.");
+        return;
+    }
+
+    document.getElementById("resumePreview").innerHTML = `
+        <div class="resume-document">
+            <h1>${escapeHTML(fields.name)}</h1>
+            <p class="resume-contact">
+                ${escapeHTML(fields.email)}
+                ${fields.phone ? " | " + escapeHTML(fields.phone) : ""}
+            </p>
+
+            <h2>CAREER OBJECTIVE</h2>
+            <p>${escapeHTML(fields.objective || "Not provided")}</p>
+
+            <h2>EDUCATION</h2>
+            <p>${escapeHTML(fields.education)}</p>
+
+            <h2>TECHNICAL SKILLS</h2>
+            <p>${escapeHTML(fields.skills)}</p>
+
+            <h2>PROJECTS</h2>
+            <p>${escapeHTML(fields.projects || "Not provided")}</p>
+
+            <h2>CERTIFICATIONS</h2>
+            <p>${escapeHTML(fields.certifications || "Not provided")}</p>
+        </div>
+    `;
+
+    document.getElementById("resumePreview").scrollIntoView({
+        behavior:"smooth"
+    });
+
+});
+
+
+// =====================================
+// 11. DOWNLOAD RESUME PDF
+// =====================================
+
+document.getElementById("downloadResume").addEventListener("click",async function() {
+
+    const resume = document.querySelector(".resume-document");
+
+    if (!resume) {
+        alert("Generate your resume first.");
+        return;
+    }
+
+    if (typeof html2pdf === "undefined") {
+        alert("PDF library not loaded. Check internet connection.");
+        return;
+    }
+
+    const button = this;
+    button.disabled = true;
+
+    try {
+
+        await html2pdf().set({
+            margin:10,
+            filename:"SkillBridge_AI_Resume.pdf",
+            image:{type:"jpeg",quality:0.98},
+            html2canvas:{scale:2,backgroundColor:"#ffffff"},
+            jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
+        }).from(resume).save();
+
+    } catch(error) {
+
+        console.error(error);
+        alert("PDF download failed.");
+
+    } finally {
+        button.disabled = false;
+    }
+
+});
+
+
+// =====================================
+// 12. LOGOUT
+// =====================================
+
+document.getElementById("logoutBtn").addEventListener("click",async function() {
+
+    try {
+
+        await fetch(API + "/api/logout", {
+            method:"POST",
+            credentials:"include"
+        });
+
+        sessionStorage.clear();
+        window.location.href = "Login.html";
+
+    } catch(error) {
+
+        alert("Logout failed. Please try again.");
+
+    }
+
+});
+
+
+// =====================================
+// 13. INITIALIZE DASHBOARD
+// =====================================
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
