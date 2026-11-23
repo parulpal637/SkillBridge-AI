@@ -1,0 +1,24 @@
+# SkillBridge AI frontend: plain static HTML/CSS/JS, no framework or package manager.
+# The Flask API (app.py) is hosted separately and is not deployed by Netlify.
+[build]
+  # Copy only the static frontend files into the publish folder so the backend
+  # source (app.py, database.py, requirements.txt) isn't served publicly.
+  command = "mkdir -p dist && cp *.html *.css *.js dist/"
+  publish = "dist"
+
+# There is no index.html, so serve the login page at the site root.
+[[redirects]]
+  from = "/"
+  to = "/login.html"
+  status = 200
+
+# Some links point to "Login.html" / "Signup.html", but the files are lowercase.
+[[redirects]]
+  from = "/Login.html"
+  to = "/login.html"
+  status = 301
+
+[[redirects]]
+  from = "/Signup.html"
+  to = "/signup.html"
+  status = 301
