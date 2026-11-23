@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const response = await fetch(
-                "http://127.0.0.1:5000/api/assessment",
+                "https://skillbridge-ai-lep0.onrender.com/api/assessment",
                 {
                     method: "POST",
 
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
 
             const response = await fetch(
-                "http://127.0.0.1:5000/api/login",
+                "https://skillbridge-ai-lep0.onrender.com/api/login",
                 {
                     method: "POST",
                     credentials: "include",
